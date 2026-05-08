@@ -1,0 +1,39 @@
+{
+  "bundle_version": "1.0",
+  "event": {
+    "slug": "20260703-dapxe-test",
+    "name": "Đạp xe Đà Nẵng 2026 Test",
+    "date": "2026-07-03",
+    "location": "Đà Nẵng",
+    "created_at": "2026-05-08T10:37:38Z"
+  },
+  "processing": {
+    "app_version": "0.1.0",
+    "ocr_model": "hybrid",
+    "ocr_model_version": "v1",
+    "face_model": "DeepFace",
+    "face_model_version": "buffalo_l/v1",
+    "processed_at": "2026-05-08T10:37:38Z",
+    "processing_machine": "MacBook-Pro-3.local",
+    "processing_duration_seconds": 84
+  },
+  "stats": {
+    "total_photos": 22,
+    "photos_with_bib_candidates": 0,
+    "photos_with_faces": 16,
+    "total_faces_detected": 27,
+    "total_bib_candidates": 0,
+    "total_thumbnails": 22
+  },
+  "files": {
+    "database": "event.db",
+    "faiss_index": "faiss.index",
+    "thumbnails_dir": "thumbnails",
+    "originals_mode": "mapping",
+    "originals_mapping": "originals_mapping.json"
+  },
+  "checksums": {
+    "event.db": "sha256:f81f062f26f490b31964e673af39ae0a59a88d42fa59723f946bfa14b46a0a10",
+    "faiss.index": "sha256:9f6934b437d146b87018c1384fa97438013921402cd58b7d4a681e268a1548eb"
+  }
+}

@@ -1,0 +1,36 @@
+{% extends "processing_base.html" %}
+{% block title %}Processing Job - DaNang Vibes{% endblock %}
+{% block content %}
+{% if job.status in ["queued", "running"] %}
+<meta http-equiv="refresh" content="3">
+{% endif %}
+<section class="card">
+  <h1>Processing job</h1>
+  <p>Status: <strong>{{ job.status }}</strong></p>
+  <p>{{ job.message }}</p>
+  <p>Source: <code>{{ job.request.source_path }}</code></p>
+  <p>Bundle: <code>{{ job.request.output_root / job.request.event_slug }}</code></p>
+  {% if job.started_at %}<p>Started: {{ job.started_at }}</p>{% endif %}
+  {% if job.finished_at %}<p>Finished: {{ job.finished_at }}</p>{% endif %}
+</section>
+
+{% if job.status == "failed" %}
+<section class="error">
+  <h2>Job failed</h2>
+  <p>{{ job.error }}</p>
+  <p><a href="/">Quay lại dashboard</a></p>
+</section>
+{% endif %}
+
+{% if job.status == "succeeded" %}
+<section class="success">
+  <h2>Bundle đã sẵn sàng</h2>
+  <p>Copy folder này sang USB/SSD:</p>
+  <p><code>{{ job.output_bundle_path }}</code></p>
+  <p>Trên máy Web Server, đặt vào:</p>
+  <p><code>inbox/bundles/{{ job.request.event_slug }}/</code></p>
+  <p>Sau đó mở App 2 Admin UI để import/publish.</p>
+  <p><a href="/">Tạo bundle khác</a></p>
+</section>
+{% endif %}
+{% endblock %}

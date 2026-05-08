@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}OCR Review - {{ event_slug }}{% endblock %}
+{% block content %}
+<section class="card hero">
+  <p class="eyebrow">OCR workflow</p>
+  <h1>Review OCR</h1>
+  <div class="event-meta">
+    <span class="pill">{{ event_slug }}</span>
+    <span class="pill">Confidence &lt; {{ threshold }}</span>
+  </div>
+  <p>Kiểm tra các bib OCR confidence thấp và lưu số bib đúng để tăng chất lượng tìm kiếm.</p>
+  <a class="button button--ghost" href="/admin/">Quay lại admin</a>
+</section>
+
+{% if candidates %}
+<section class="review-list" aria-label="Danh sách OCR candidate">
+  {% for candidate in candidates %}
+  <article class="card review-card">
+    <img class="thumb" src="/events/{{ event_slug }}/photos/{{ candidate.photo_id }}/thumbnail" alt="Photo {{ candidate.photo_id }}">
+    <div class="review-meta">
+      <p class="status-badge">Photo #{{ candidate.photo_id }}</p>
+      <h2>OCR: {{ candidate.text }}</h2>
+      <p class="helper-text">Confidence {{ candidate.confidence }}</p>
+      {% if candidate.manual_correction %}
+        <p class="status-badge status-badge--published">Đã sửa: {{ candidate.manual_correction }}</p>
+      {% endif %}
+      <form method="post" action="/admin/events/{{ event_slug }}/ocr-correct">
+        <input type="hidden" name="ocr_candidate_id" value="{{ candidate.id }}">
+        <div class="form-row">
+          <div class="field">
+            <label for="corrected-text-{{ loop.index }}">Bib đúng</label>
+            <input id="corrected-text-{{ loop.index }}" name="corrected_text" inputmode="numeric" required placeholder="VD: 1234">
+          </div>
+          <button class="button--cta" type="submit">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </article>
+  {% endfor %}
+</section>
+{% else %}
+<section class="card empty-state">
+  <strong>Không có OCR candidate cần review.</strong>
+  <p>Các candidate dưới threshold hiện đã hết hoặc event chưa có dữ liệu OCR cần sửa.</p>
+  <a class="button button--ghost" href="/admin/">Quay lại admin</a>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{
+  "bundle_version": "1.0",
+  "event": {
+    "slug": "test-bib",
+    "name": "test bib",
+    "date": "2026-05-09",
+    "location": null,
+    "created_at": "2026-05-08T22:12:16Z"
+  },
+  "processing": {
+    "app_version": "0.1.0",
+    "ocr_model": "hybrid",
+    "ocr_model_version": "v1",
+    "face_model": "disabled",
+    "face_model_version": "disabled",
+    "processed_at": "2026-05-08T22:12:16Z",
+    "processing_machine": "MacBook-Pro-3.local",
+    "processing_duration_seconds": 58
+  },
+  "stats": {
+    "total_photos": 35,
+    "photos_with_bib_candidates": 1,
+    "photos_with_faces": 0,
+    "total_faces_detected": 0,
+    "total_bib_candidates": 1,
+    "total_thumbnails": 35
+  },
+  "files": {
+    "database": "event.db",
+    "faiss_index": "faiss.index",
+    "thumbnails_dir": "thumbnails",
+    "originals_mode": "embedded",
+    "originals_mapping": "originals_mapping.json"
+  },
+  "checksums": {
+    "event.db": "sha256:c55af1a8fed1a72f131d6a4d2d52f27341f490a0841a55b11b75f9bf55ad101b",
+    "faiss.index": "sha256:f92eda1cc4e62ba5edc40a1e5d70df641de380cbad24030f44600fc0f353c471"
+  }
+}

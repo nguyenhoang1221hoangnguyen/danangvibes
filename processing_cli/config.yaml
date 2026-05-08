@@ -1,0 +1,14 @@
+ocr:
+  enabled: true
+  confidence_threshold: 0.6
+face:
+  enabled: true
+  model: InsightFace
+  model_name: buffalo_l
+  model_version: v1
+processing:
+  thumbnail_size: [800, 600]
+  thumbnail_quality: 85
+  max_image_size: 1280
+output:
+  originals_mode: mapping

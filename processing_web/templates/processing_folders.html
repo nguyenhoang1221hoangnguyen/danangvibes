@@ -1,0 +1,33 @@
+{% extends "processing_base.html" %}
+{% block title %}Chọn thư mục ảnh - DaNang Vibes{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Chọn thư mục ảnh</h1>
+  <p>Thư mục hiện tại: <code>{{ current_path }}</code></p>
+  <p>Số ảnh JPG/JPEG trực tiếp trong thư mục này: <strong>{{ jpeg_count }}</strong></p>
+  <p><a href="/?source_path={{ current_path | url_quote }}"><button type="button">Chọn thư mục này</button></a></p>
+</section>
+
+<section class="card">
+  <h2>Vị trí nhanh</h2>
+  {% for root in roots %}
+  <p><a href="/folders?path={{ root.path | url_quote }}">{{ root.label }}</a> · <code>{{ root.path }}</code></p>
+  {% endfor %}
+</section>
+
+<section class="card">
+  <h2>Thư mục con</h2>
+  {% if parent_path %}
+  <p><a href="/folders?path={{ parent_path | url_quote }}">.. lên thư mục cha</a></p>
+  {% endif %}
+  {% if children %}
+  {% for child in children %}
+  <p><a href="/folders?path={{ child | url_quote }}">{{ child.name }}</a></p>
+  {% endfor %}
+  {% else %}
+  <p>Không có thư mục con.</p>
+  {% endif %}
+</section>
+
+<p><a href="/">Quay lại dashboard</a></p>
+{% endblock %}

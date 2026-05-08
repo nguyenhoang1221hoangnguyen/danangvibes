@@ -1,0 +1,39 @@
+{
+  "bundle_version": "1.0",
+  "event": {
+    "slug": "5",
+    "name": "5",
+    "date": "2026-05-08",
+    "location": null,
+    "created_at": "2026-05-07T22:16:07Z"
+  },
+  "processing": {
+    "app_version": "0.1.0",
+    "ocr_model": "PaddleOCR",
+    "ocr_model_version": "v1",
+    "face_model": "disabled",
+    "face_model_version": "disabled",
+    "processed_at": "2026-05-07T22:16:07Z",
+    "processing_machine": "MacBook-Pro-3.local",
+    "processing_duration_seconds": 32
+  },
+  "stats": {
+    "total_photos": 22,
+    "photos_with_bib_candidates": 3,
+    "photos_with_faces": 0,
+    "total_faces_detected": 0,
+    "total_bib_candidates": 3,
+    "total_thumbnails": 22
+  },
+  "files": {
+    "database": "event.db",
+    "faiss_index": "faiss.index",
+    "thumbnails_dir": "thumbnails",
+    "originals_mode": "mapping",
+    "originals_mapping": "originals_mapping.json"
+  },
+  "checksums": {
+    "event.db": "sha256:30784e45c7670cd373ab88f7e1ddcbf7815f98fb126ca280266df0e894fa69db",
+    "faiss.index": "sha256:f92eda1cc4e62ba5edc40a1e5d70df641de380cbad24030f44600fc0f353c471"
+  }
+}

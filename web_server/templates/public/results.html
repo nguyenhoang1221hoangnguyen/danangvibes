@@ -1,0 +1,41 @@
+<section class="card results-panel">
+  <div class="section-header">
+    <div>
+      <p class="eyebrow">Kết quả tìm kiếm</p>
+      <h2>{% if query %}Bib #{{ query }}{% else %}Face search{% endif %}</h2>
+    </div>
+    <span class="status-badge">{{ results.total_results }} ảnh</span>
+  </div>
+  {% if results.message %}<p class="notice">{{ results.message }}</p>{% endif %}
+  {% if results.total_results == 0 %}
+    <div class="empty-state">
+      <strong>Không tìm thấy ảnh phù hợp.</strong>
+      <p>Thử kiểm tra lại số bib, bỏ số 0 ở đầu, hoặc dùng selfie nếu sự kiện hỗ trợ.</p>
+    </div>
+  {% else %}
+    <div class="result-grid">
+      {% for photo in results.bib_matches + results.face_matches %}
+        <article class="result-card">
+          <img class="thumb" src="{{ photo.thumbnail_url }}" alt="Ảnh thi đấu Photo {{ photo.photo_id }}" loading="lazy">
+          <div class="result-card__body">
+            <p class="result-title">Photo #{{ photo.photo_id }}</p>
+            {% if photo.similarity_score %}
+              <span class="status-badge">Match {{ (photo.similarity_score * 100)|round|int }}%</span>
+            {% endif %}
+            <a class="button button--cta download-button" href="/events/{{ event_slug }}/photos/{{ photo.photo_id }}/download">Tải ảnh gốc</a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+    {% if donation.message or donation.qr_url %}
+      <section class="donation-card card">
+        <p class="eyebrow">Ủng hộ</p>
+        <h3>Ủng hộ nếu thấy hữu ích</h3>
+        {% if donation.message %}<p>{{ donation.message }}</p>{% endif %}
+        {% if donation.qr_url %}<img class="qr" src="{{ donation.qr_url }}" alt="Mã QR ủng hộ dự án">{% endif %}
+      </section>
+    {% else %}
+      <p class="helper-text">Nếu thấy hữu ích, bạn có thể donate sau khi tải ảnh.</p>
+    {% endif %}
+  {% endif %}
+</section>

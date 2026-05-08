@@ -1,0 +1,14 @@
+{
+  "total": 1,
+  "success": 1,
+  "failed": 0,
+  "skipped": 0,
+  "total_time_seconds": 74.18662595748901,
+  "results": [
+    {
+      "event": "20260703-dapxe",
+      "status": "success",
+      "time": 74.18628311157227
+    }
+  ]
+}

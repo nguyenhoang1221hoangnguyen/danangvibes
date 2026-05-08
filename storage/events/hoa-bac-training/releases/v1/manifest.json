@@ -1,0 +1,39 @@
+{
+  "bundle_version": "1.0",
+  "event": {
+    "slug": "hoa-bac-training",
+    "name": "Hòa Bắc Training",
+    "date": "2026-05-09",
+    "location": null,
+    "created_at": "2026-05-08T21:57:30Z"
+  },
+  "processing": {
+    "app_version": "0.1.0",
+    "ocr_model": "hybrid",
+    "ocr_model_version": "v1",
+    "face_model": "DeepFace",
+    "face_model_version": "buffalo_l/v1",
+    "processed_at": "2026-05-08T22:17:42Z",
+    "processing_machine": "MacBook-Pro-3.local",
+    "processing_duration_seconds": 42
+  },
+  "stats": {
+    "total_photos": 95,
+    "photos_with_bib_candidates": 3,
+    "photos_with_faces": 73,
+    "total_faces_detected": 170,
+    "total_bib_candidates": 3,
+    "total_thumbnails": 95
+  },
+  "files": {
+    "database": "event.db",
+    "faiss_index": "faiss.index",
+    "thumbnails_dir": "thumbnails",
+    "originals_mode": "embedded",
+    "originals_mapping": "originals_mapping.json"
+  },
+  "checksums": {
+    "event.db": "sha256:d824b7253f95ed3d752b9806cbcd58823813cc2147a17b9955c2969926ec1981",
+    "faiss.index": "sha256:0c02d3aa63e9ac894870824cd0cd366c065b286d46337a172e0ef4ccc2a21afb"
+  }
+}

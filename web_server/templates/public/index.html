@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Sự kiện - DaNang Vibes{% endblock %}
+{% block content %}
+<section class="card hero">
+  <p class="eyebrow">DaNang Vibes Photo Finder</p>
+  <h1>Tìm và tải ảnh thi đấu của bạn</h1>
+  <p>Chọn sự kiện đã publish, nhập số bib để tìm ảnh nhanh nhất, hoặc dùng selfie nếu bạn không nhớ số bib.</p>
+  {% if events %}
+    <a class="button button--cta" href="#events">Xem sự kiện</a>
+  {% endif %}
+</section>
+
+<section id="events" class="card">
+  <div class="section-header">
+    <div>
+      <p class="eyebrow">Public events</p>
+      <h2>Sự kiện đang mở</h2>
+      <p>Mỗi event có trang tìm ảnh riêng cho vận động viên và người tham gia.</p>
+    </div>
+  </div>
+  {% if events %}
+    <div class="event-grid">
+      {% for event in events %}
+        <article class="event-card">
+          <p class="status-badge status-badge--published">Đã publish</p>
+          <h2>{{ event.name }}</h2>
+          <p class="event-card__meta"><code>{{ event.slug }}</code></p>
+          <div class="event-card__actions">
+            <a class="button button--cta" href="/events/{{ event.slug }}">Mở sự kiện</a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <strong>Chưa có sự kiện public.</strong>
+      <p>Admin cần import bundle và publish event trước khi người dùng có thể tìm ảnh.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

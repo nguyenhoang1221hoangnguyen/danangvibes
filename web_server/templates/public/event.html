@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}{{ event.name }} - DaNang Vibes{% endblock %}
+{% block content %}
+<section class="card hero">
+  <p class="eyebrow">Tìm ảnh sự kiện</p>
+  <h1>{{ event.name }}</h1>
+  <div class="event-meta">
+    <span class="pill">{{ event.date }}</span>
+    {% if event.location %}<span class="pill">{{ event.location }}</span>{% endif %}
+  </div>
+  <p>Nhập số bib trên áo hoặc bảng số để tìm nhanh ảnh thi đấu của bạn. Nếu không nhớ bib, thử tìm bằng selfie.</p>
+  <div class="stat-grid" aria-label="Thống kê sự kiện">
+    <div class="stat-card">
+      <strong>{{ stats.total_photos }}</strong>
+      <span>ảnh trong sự kiện</span>
+    </div>
+    <div class="stat-card">
+      <strong>{{ stats.photos_with_bib_candidates }}</strong>
+      <span>ảnh có bib</span>
+    </div>
+    <div class="stat-card">
+      <strong>{{ stats.photos_with_faces }}</strong>
+      <span>ảnh có khuôn mặt</span>
+    </div>
+  </div>
+</section>
+
+<section class="search-layout" aria-label="Công cụ tìm ảnh">
+  <div class="card search-card search-card--primary">
+    <div>
+      <p class="eyebrow">Nhanh nhất</p>
+      <h2>Tìm bằng số bib</h2>
+      <p class="helper-text">Nhập số trên áo hoặc bảng số. Ví dụ: 1234.</p>
+    </div>
+    <form hx-post="/events/{{ event.slug }}/search/bib" hx-target="#results" hx-indicator="#bib-loading">
+      <div class="form-row">
+        <div class="field">
+          <label for="bib_number">Số bib của bạn</label>
+          <input id="bib_number" name="bib_number" inputmode="numeric" autocomplete="off" required placeholder="VD: 1234">
+        </div>
+        <button class="button--cta" type="submit">Tìm ảnh</button>
+      </div>
+      <p id="bib-loading" class="htmx-indicator">Đang tìm ảnh theo bib...</p>
+    </form>
+  </div>
+
+  <div class="card search-card">
+    <div>
+      <p class="eyebrow">Không nhớ bib?</p>
+      <h2>Tìm bằng selfie</h2>
+      <p class="helper-text">Tải ảnh JPG/PNG thấy rõ khuôn mặt. Face search chỉ hoạt động khi event có face index.</p>
+    </div>
+    <form hx-post="/events/{{ event.slug }}/search/face" hx-encoding="multipart/form-data" hx-target="#results" hx-indicator="#face-loading">
+      <div class="field">
+        <label for="selfie">Ảnh selfie</label>
+        <input id="selfie" type="file" name="selfie" accept="image/jpeg,image/png" required>
+      </div>
+      <button class="button--secondary" type="submit">Tìm khuôn mặt</button>
+      <p id="face-loading" class="htmx-indicator">Đang so khớp khuôn mặt...</p>
+    </form>
+  </div>
+</section>
+
+{% if donation.message or donation.qr_url %}
+<section class="card donation-card">
+  <p class="eyebrow">Ủng hộ</p>
+  <h2>Ủng hộ dự án</h2>
+  {% if donation.message %}<p>{{ donation.message }}</p>{% endif %}
+  {% if donation.qr_url %}<img class="qr" src="{{ donation.qr_url }}" alt="Mã QR ủng hộ dự án">{% endif %}
+</section>
+{% endif %}
+
+<div id="results" class="results-region" aria-live="polite" tabindex="-1"></div>
+{% endblock %}

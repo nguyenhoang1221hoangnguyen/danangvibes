@@ -1,0 +1,60 @@
+======================================================================
+FACE RECOGNITION COMPARISON - CHALLENGING RACE PHOTOS
+======================================================================
+
+Test cases:
+1. HOD_5240.jpg: Cúi đầu xuống, mặt hướng xuống - Cực khó
+2. HOD_5346.jpg: Góc chụp từ sau lưng - Cực khó
+3. HOD_5259.jpg: Chụp từ xa 30-40m, khuôn mặt nhỏ - Rất khó
+4. HOD_5280.jpg: Chụp từ xa, nhiều VĐV - Rất khó
+5. HOD_5229.jpg: Mũ che trán, góc nghiêng 3/4 - Khó
+
+======================================================================
+Testing: DeepFace (VGG-Face)
+======================================================================
+
+📷 HOD_5240.jpg
+   Challenge: Cúi đầu xuống, mặt hướng xuống - Cực khó
+   ✅ Detected 2 face(s) in 4.39s
+      Confidence: 0.940
+      Embedding dim: 4096
+
+📷 HOD_5346.jpg
+   Challenge: Góc chụp từ sau lưng - Cực khó
+   ✅ Detected 1 face(s) in 2.94s
+      Confidence: 0.000
+      Embedding dim: 4096
+
+📷 HOD_5259.jpg
+   Challenge: Chụp từ xa 30-40m, khuôn mặt nhỏ - Rất khó
+   ✅ Detected 1 face(s) in 2.46s
+      Confidence: 0.950
+      Embedding dim: 4096
+
+📷 HOD_5280.jpg
+   Challenge: Chụp từ xa, nhiều VĐV - Rất khó
+   ✅ Detected 10 face(s) in 3.63s
+      Confidence: 0.970
+      Embedding dim: 4096
+
+📷 HOD_5229.jpg
+   Challenge: Mũ che trán, góc nghiêng 3/4 - Khó
+   ✅ Detected 5 face(s) in 3.42s
+      Confidence: 0.990
+      Embedding dim: 4096
+
+──────────────────────────────────────────────────────────────────────
+Summary for DeepFace (VGG-Face):
+  Success rate: 5/5 (100%)
+  Average time: 3.37s per image
+  Total time: 16.84s
+
+======================================================================
+Testing: face_recognition (dlib HOG)
+======================================================================
+❌ Cannot initialize face_recognition (dlib HOG): Install face_recognition: pip install face_recognition
+
+======================================================================
+Testing: InsightFace (buffalo_l)
+======================================================================
+❌ Cannot initialize InsightFace (buffalo_l): Install insightface to enable face recognition: pip install insightface onnxruntime

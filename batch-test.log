@@ -1,0 +1,42 @@
+Found 1 events to process
+Skip OCR: True, Skip Faces: False
+------------------------------------------------------------
+
+[1/1] Processing: 20260703 dapxe (20260703-dapxe)
+  Source: /Users/nguyenhoang/Desktop/2026/Tháng 5/dap xe/dap/Output/20260703 dapxe
+Found 22 JPG photos
+Processed 1/22: HOD_5218 1.jpg
+Processed 2/22: HOD_5218.jpg
+Processed 3/22: HOD_5219 1.jpg
+Processed 4/22: HOD_5219.jpg
+Processed 5/22: HOD_5224 1.jpg
+Processed 6/22: HOD_5224.jpg
+Processed 7/22: HOD_5229 1.jpg
+Processed 8/22: HOD_5229.jpg
+Processed 9/22: HOD_5237 1.jpg
+Processed 10/22: HOD_5237.jpg
+Processed 11/22: HOD_5240 1.jpg
+Processed 12/22: HOD_5240.jpg
+Processed 13/22: HOD_5259 1.jpg
+Processed 14/22: HOD_5259.jpg
+Processed 15/22: HOD_5280 1.jpg
+Processed 16/22: HOD_5280.jpg
+Processed 17/22: HOD_5295 1.jpg
+Processed 18/22: HOD_5295.jpg
+Processed 19/22: HOD_5297 1.jpg
+Processed 20/22: HOD_5297.jpg
+Processed 21/22: HOD_5346 1.jpg
+Processed 22/22: HOD_5346.jpg
+Bundle exported: dist/events/20260703-dapxe
+  ✅ SUCCESS in 74.2s
+
+============================================================
+BATCH PROCESSING SUMMARY
+============================================================
+Total events: 1
+  ✅ Success: 1
+  ❌ Failed: 0
+  ⏭️  Skipped: 0
+Total time: 74.2s (1.2 minutes)
+
+Results saved to: dist/events/batch_results.json

@@ -1,0 +1,116 @@
+{% extends "processing_base.html" %}
+{% block title %}Processing App - DaNang Vibes{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Processing App</h1>
+  <p>Xử lý ảnh sự kiện thể thao với AI: OCR số bib + Face Recognition</p>
+
+  <div style="margin-top: 16px; padding: 12px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px;">
+    <p style="margin: 0 0 8px 0;"><strong>⚡ Face Recognition:</strong> InsightFace (buffalo_l)</p>
+    <ul style="margin: 0; padding-left: 20px; font-size: 14px;">
+      <li>Tốc độ: ~0.37s/ảnh (nhanh gấp 9x DeepFace)</li>
+      <li>Tốt với mũ bảo hiểm, kính râm, góc nghiêng</li>
+      <li>Ít false positives, không detect ảnh từ sau lưng</li>
+      <li>Embedding: 512-dim (nhỏ gọn, hiệu quả)</li>
+    </ul>
+  </div>
+
+  <div style="margin-top: 12px; padding: 12px; background: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px;">
+    <p style="margin: 0 0 8px 0;"><strong>🔍 OCR Method:</strong> Hybrid YOLO + Tesseract (mặc định)</p>
+    <ul style="margin: 0; padding-left: 20px; font-size: 14px;">
+      <li>Tốc độ: ~0.6s/ảnh (nhanh gấp 24x PaddleOCR)</li>
+      <li>YOLO detect vùng text → Tesseract OCR</li>
+      <li>Khuyến nghị cho production</li>
+    </ul>
+  </div>
+
+  <p style="margin-top: 12px; font-size: 14px; color: #6b7280;">Output: <code>{{ settings.output_root }}</code></p>
+</section>
+
+{% if error %}
+<section class="error">{{ error }}</section>
+{% endif %}
+
+<section class="card">
+  <h2>Trạng thái AI</h2>
+  {% if ai_dependencies.ready %}
+  <p class="success">✅ InsightFace + Hybrid OCR + FAISS đã sẵn sàng</p>
+  {% else %}
+  <p class="error">❌ Thiếu dependencies: {{ ", ".join(ai_dependencies.missing) }}<br>
+  Chạy: <code>INSTALL_AI=1 scripts/setup-local-env.sh</code></p>
+  {% endif %}
+</section>
+
+{% if job and job.status in ["queued", "running"] %}
+<section class="notice">
+  <p>⏳ Đang có job chạy: <a href="/jobs/current">xem trạng thái</a></p>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Tạo event bundle</h2>
+  <form method="post" action="/process">
+    <label>Folder ảnh local
+      <input name="source_path" value="{{ source_path }}" placeholder="/Volumes/SSD/photos" required>
+    </label>
+    <p style="margin-top: 8px;"><a href="/folders">📁 Chọn thư mục ảnh nhanh</a></p>
+
+    <label>Event slug
+      <input name="event_slug" placeholder="ironman-danang-2026" required>
+    </label>
+    <label>Event name
+      <input name="event_name" placeholder="Ironman Da Nang 2026" required>
+    </label>
+    <label>Event date
+      <input name="event_date" type="date" value="{{ today }}" required>
+    </label>
+    <label>Event location
+      <input name="event_location" placeholder="Da Nang">
+    </label>
+
+    <fieldset style="margin-top: 16px; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+      <legend style="font-weight: 600; padding: 0 8px;">OCR Method</legend>
+      <label style="display: block; margin: 12px 0; padding: 10px; background: #f9fafb; border-radius: 6px; cursor: pointer;">
+        <input type="radio" name="ocr_method" value="hybrid" checked>
+        <strong>Hybrid (YOLO + Tesseract)</strong> ⚡ Khuyến nghị
+        <div style="font-size: 13px; color: #6b7280; margin-top: 4px; margin-left: 24px;">
+          Nhanh nhất (~0.6s/ảnh). Tốt cho 1,000-10,000 ảnh.
+        </div>
+      </label>
+      <label style="display: block; margin: 12px 0; padding: 10px; background: #f9fafb; border-radius: 6px; cursor: pointer;">
+        <input type="radio" name="ocr_method" value="paddle">
+        <strong>PaddleOCR</strong> 🎯 Chính xác cao
+        <div style="font-size: 13px; color: #6b7280; margin-top: 4px; margin-left: 24px;">
+          Chậm (~3-5s/ảnh). Dùng khi cần accuracy tối đa.
+        </div>
+      </label>
+      <label style="display: block; margin: 12px 0; padding: 10px; background: #f9fafb; border-radius: 6px; cursor: pointer;">
+        <input type="radio" name="ocr_method" value="skip">
+        <strong>Skip OCR</strong> 👤 Chỉ face
+        <div style="font-size: 13px; color: #6b7280; margin-top: 4px; margin-left: 24px;">
+          Chỉ face detection, không OCR số bib.
+        </div>
+      </label>
+    </fieldset>
+
+    <fieldset style="margin-top: 16px; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+      <legend style="font-weight: 600; padding: 0 8px;">Face Recognition</legend>
+      <div style="padding: 10px; background: #f0fdf4; border-radius: 6px;">
+        <p style="margin: 0; font-size: 14px;">
+          <strong>✓ InsightFace (buffalo_l)</strong> - Luôn bật
+        </p>
+        <p style="margin: 8px 0 0 0; font-size: 13px; color: #6b7280;">
+          Model tốt nhất cho ảnh race với mũ/kính. Không thể tắt.
+        </p>
+      </div>
+    </fieldset>
+
+    <label style="margin-top: 16px;">
+      <input type="checkbox" name="force" value="true">
+      <strong>Force rebuild</strong> - Xóa và tạo lại bundle nếu đã tồn tại
+    </label>
+
+    <button type="submit" style="margin-top: 16px; width: 100%;">🚀 Start processing</button>
+  </form>
+</section>
+{% endblock %}

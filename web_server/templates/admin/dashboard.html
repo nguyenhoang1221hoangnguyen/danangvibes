@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Admin - DaNang Vibes{% endblock %}
+{% block content %}
+<section class="card hero">
+  <p class="eyebrow">Admin console</p>
+  <h1>Quản trị sự kiện</h1>
+  <p>Import bundle từ USB/SSD, publish event cho người dùng, theo dõi lượt tải và cấu hình donation.</p>
+  <div class="metric-grid" aria-label="Tổng quan admin">
+    <div class="metric">
+      <strong>{{ events|length }}</strong>
+      <span>event đã import</span>
+    </div>
+    <div class="metric">
+      <strong>{{ importable_bundles|length }}</strong>
+      <span>bundle trong inbox</span>
+    </div>
+    <div class="metric">
+      <strong>{{ inbox_path }}</strong>
+      <span>inbox path</span>
+    </div>
+  </div>
+</section>
+
+<section class="card admin-note">
+  <strong>Auth admin</strong>
+  <p>Gọi admin bằng HTTP Basic password là admin token, hoặc header <code>Authorization: Bearer &lt;ADMIN_TOKEN&gt;</code>.</p>
+</section>
+
+<section class="card">
+  <div class="section-header">
+    <div>
+      <p class="eyebrow">Import</p>
+      <h2>Import bundle từ USB/SSD</h2>
+      <p>Copy folder bundle vào <code>{{ inbox_path }}</code>. Định dạng cần có: <code>inbox/bundles/&lt;event-slug&gt;/manifest.json</code>.</p>
+    </div>
+  </div>
+  {% if importable_bundles %}
+  <form method="post" action="/admin/import">
+    <div class="field">
+      <label for="bundle_name">Chọn bundle</label>
+      <select id="bundle_name" name="bundle_name" required>
+        {% for bundle in importable_bundles %}
+        <option value="{{ bundle }}">{{ bundle }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <label class="checkbox-field">
+      <input type="checkbox" name="publish" value="true">
+      Publish ngay sau khi import
+    </label>
+    <button class="button--cta" type="submit">Import bundle</button>
+  </form>
+  {% else %}
+  <div class="empty-state">
+    <strong>Chưa có bundle nào trong inbox.</strong>
+    <p>Copy bundle từ máy xử lý ảnh vào inbox rồi refresh lại trang admin.</p>
+  </div>
+  {% endif %}
+</section>
+
+<section class="card">
+  <div class="section-header">
+    <div>
+      <p class="eyebrow">Events</p>
+      <h2>Event đã import</h2>
+      <p>Publish event khi đã sẵn sàng cho người dùng tìm và tải ảnh.</p>
+    </div>
+  </div>
+  {% if events %}
+    <div class="admin-grid">
+      {% for event in events %}
+      <article class="admin-event-card">
+        <div class="section-header">
+          <div>
+            <p class="status-badge {% if event.is_published %}status-badge--published{% else %}status-badge--draft{% endif %}">
+              {% if event.is_published %}Published{% else %}Unpublished{% endif %}
+            </p>
+            <h2>{{ event.name }}</h2>
+            <p class="event-card__meta"><code>{{ event.slug }}</code> · active {{ event.active_version }}</p>
+          </div>
+        </div>
+        <p class="helper-text">{{ event.download_count }} downloads · {{ event.unique_downloaded_photos }} ảnh đã tải{% if event.last_downloaded_at %} · gần nhất {{ event.last_downloaded_at }}{% endif %}</p>
+        <div class="metric-grid">
+          <div class="metric">
+            <strong>{{ event.download_count }}</strong>
+            <span>downloads</span>
+          </div>
+          <div class="metric">
+            <strong>{{ event.unique_downloaded_photos }}</strong>
+            <span>ảnh đã tải</span>
+          </div>
+          <div class="metric">
+            <strong>{% if event.last_downloaded_at %}{{ event.last_downloaded_at }}{% else %}—{% endif %}</strong>
+            <span>lần tải gần nhất</span>
+          </div>
+        </div>
+        <div class="actions">
+          <form method="post" action="/admin/events/{{ event.slug }}/{% if event.is_published %}unpublish{% else %}publish{% endif %}">
+            <button class="{% if event.is_published %}button--danger{% else %}button--cta{% endif %}" type="submit">
+              {% if event.is_published %}Unpublish{% else %}Publish{% endif %}
+            </button>
+          </form>
+          {% if event.is_published %}<a class="button button--ghost" href="/events/{{ event.slug }}">Mở public</a>{% endif %}
+          <a class="button button--secondary" href="/admin/events/{{ event.slug }}/ocr-review">Review OCR</a>
+        </div>
+        <hr>
+        <h3>Donation</h3>
+        <form method="post" action="/admin/events/{{ event.slug }}/donation-message">
+          <div class="field">
+            <label for="donation-message-{{ loop.index }}">Donation message</label>
+            <input id="donation-message-{{ loop.index }}" name="message" placeholder="VD: Cảm ơn bạn đã ủng hộ team ảnh">
+          </div>
+          <button type="submit">Lưu donation message</button>
+        </form>
+        <form method="post" action="/admin/events/{{ event.slug }}/qr" enctype="multipart/form-data">
+          <div class="field">
+            <label for="qr-image-{{ loop.index }}">QR donate PNG/JPEG</label>
+            <input id="qr-image-{{ loop.index }}" type="file" name="qr_image" accept="image/png,image/jpeg" required>
+          </div>
+          <button class="button--secondary" type="submit">Upload QR donate</button>
+        </form>
+      </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <strong>Chưa có event nào.</strong>
+      <p>Import bundle đầu tiên để bắt đầu publish event.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
