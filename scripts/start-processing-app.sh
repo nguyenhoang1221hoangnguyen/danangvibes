@@ -11,12 +11,15 @@ INSTALL_AI="${INSTALL_AI:-1}"
 VENV_DIR="${DANANGVIBES_PROCESSING_VENV_DIR:-$PROJECT_ROOT/venv-ai}"
 PYTHON_BIN_FALLBACK="${PYTHON_BIN_FALLBACK:-}"
 
-find_python_311() {
+find_python3() {
   if [ -n "$PYTHON_BIN_FALLBACK" ] && command -v "$PYTHON_BIN_FALLBACK" >/dev/null 2>&1; then
     command -v "$PYTHON_BIN_FALLBACK"
     return 0
   fi
-  for candidate in python3.11 /opt/homebrew/bin/python3.11 /usr/local/bin/python3.11; do
+  # Prefer versions known to work with AI deps (TensorFlow), then fall back to any python3
+  for candidate in python3.11 python3.12 python3.10 python3 \
+    /opt/homebrew/bin/python3.11 /opt/homebrew/bin/python3.12 /opt/homebrew/bin/python3.10 /opt/homebrew/bin/python3 \
+    /usr/local/bin/python3.11 /usr/local/bin/python3.12 /usr/local/bin/python3.10 /usr/local/bin/python3; do
     if command -v "$candidate" >/dev/null 2>&1; then
       command -v "$candidate"
       return 0
@@ -26,25 +29,26 @@ find_python_311() {
 }
 
 if [ ! -x "$VENV_DIR/bin/python" ]; then
-  if ! PYTHON_311_BIN="$(find_python_311)"; then
+  if ! PYTHON3_BIN="$(find_python3)"; then
     cat <<'EOF'
-Python 3.11 is required for the full OCR + DeepFace Processing Web App.
-Current AI dependencies do not install reliably on Python 3.14 because TensorFlow has no matching wheel.
+Python 3 is required for the Processing Web App.
+No python3 found on PATH.
 
-Install Python 3.11 once:
-  brew install python@3.11
+Install Python 3:
+  brew install python@3.12
 
-Then run only:
+Then run:
   scripts/start-processing-app.sh
 EOF
     exit 2
   fi
 else
-  PYTHON_311_BIN="$VENV_DIR/bin/python"
-  if ! "$PYTHON_311_BIN" -c 'import sys; raise SystemExit(0 if sys.version_info[:2] == (3, 11) else 1)' >/dev/null 2>&1; then
+  PYTHON3_BIN="$VENV_DIR/bin/python"
+  if ! "$PYTHON3_BIN" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)' >/dev/null 2>&1; then
+    PYVER=$("$PYTHON3_BIN" -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
     cat <<EOF
-Existing Processing AI venv is not Python 3.11: $VENV_DIR
-Remove it once, then rerun:
+Existing Processing AI venv uses Python $PYVER, which may be too old.
+Remove it and rerun:
   rm -rf "$VENV_DIR"
   scripts/start-processing-app.sh
 EOF
@@ -52,7 +56,7 @@ EOF
   fi
 fi
 
-VENV_DIR="$VENV_DIR" PYTHON_BIN_FALLBACK="$PYTHON_311_BIN" INSTALL_AI="$INSTALL_AI" "$PROJECT_ROOT/scripts/setup-local-env.sh"
+VENV_DIR="$VENV_DIR" PYTHON_BIN_FALLBACK="$PYTHON3_BIN" INSTALL_AI="$INSTALL_AI" "$PROJECT_ROOT/scripts/setup-local-env.sh"
 PYTHON_BIN="$VENV_DIR/bin/python"
 mkdir -p "$OUTPUT_DIR"
 
