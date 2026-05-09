@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import Any
 
 from shared.bundle import EMPTY_FAISS_SENTINEL
+
+logger = logging.getLogger(__name__)
 
 
 class FaissBuilder:
@@ -24,9 +27,12 @@ class FaissBuilder:
         if self._index is None:
             self._dimension = int(vector.shape[1])
             self._index = faiss.IndexFlatIP(self._dimension)
+            logger.debug("FaissBuilder: initialized IndexFlatIP dim=%d", self._dimension)
         vector_id = int(self._index.ntotal)
         self._index.add(vector)
         self._count += 1
+        if self._count <= 3 or self._count % 100 == 0:
+            logger.debug("FaissBuilder: added vector_id=%d total=%d", vector_id, self._count)
         return vector_id
 
     def save(self, output_path: Path) -> None:

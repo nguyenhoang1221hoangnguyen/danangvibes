@@ -132,6 +132,27 @@ def _build_manifest(
     )
 
 
+def _save_face_crop(image_path: Path, bbox_json: str, output_path: Path) -> None:
+    try:
+        import cv2
+        bbox = json.loads(bbox_json)
+        x, y, w, h = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
+        img = cv2.imread(str(image_path))
+        if img is None:
+            return
+        # Clamp to image bounds
+        x = max(0, x)
+        y = max(0, y)
+        x2 = min(img.shape[1], x + w)
+        y2 = min(img.shape[0], y + h)
+        if x2 <= x or y2 <= y:
+            return
+        crop = img[y:y2, x:x2]
+        cv2.imwrite(str(output_path), crop)
+    except Exception as exc:
+        print(f"  Warning: failed to save face crop: {exc}")
+
+
 def run(
     source: Path,
     event_slug: str,
@@ -163,6 +184,7 @@ def run(
     bundle_path = output / event_slug
     db_path = bundle_path / "event.db"
     thumbnails_dir = bundle_path / "thumbnails"
+    faces_dir = bundle_path / "faces"
     originals_dir = bundle_path / "originals" if copy_originals else None
     if force and bundle_path.exists():
         import shutil
@@ -170,6 +192,7 @@ def run(
         shutil.rmtree(bundle_path)
     bundle_path.mkdir(parents=True, exist_ok=True)
     thumbnails_dir.mkdir(parents=True, exist_ok=True)
+    faces_dir.mkdir(parents=True, exist_ok=True)
     if originals_dir:
         originals_dir.mkdir(parents=True, exist_ok=True)
 
@@ -271,7 +294,9 @@ def run(
                             (photo_id, candidate["text"], candidate["confidence"], candidate["bbox"], candidate["is_bib"]),
                         )
             if face_service:
-                for face in face_service.detect_and_embed(photo_path):
+                detected_faces = face_service.detect_and_embed(photo_path)
+                print(f"  Faces detected: {len(detected_faces)}")
+                for face_idx, face in enumerate(detected_faces):
                     vector_id = faiss_builder.add_embedding(face["embedding"])
                     connection.execute(
                         """
@@ -280,9 +305,12 @@ def run(
                         """,
                         (photo_id, face["bbox"], face["confidence"], vector_id, face["embedding_model"], face["embedding_model_version"]),
                     )
+                    face_id = int(connection.execute("SELECT last_insert_rowid()").fetchone()[0])
+                    _save_face_crop(photo_path, face["bbox"], faces_dir / f"face_{face_id:06d}.jpg")
             connection.commit()
             print(f"Processed {index}/{len(photos)}: {photo_path.name}")
         faiss_builder.save(bundle_path / "faiss.index")
+        print(f"FAISS index saved: {faiss_builder.count} vectors")
     finally:
         connection.close()
 

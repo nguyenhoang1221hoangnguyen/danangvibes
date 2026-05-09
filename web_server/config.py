@@ -19,7 +19,12 @@ class Settings:
 
 
 def load_settings() -> Settings:
+    import logging
     storage_path = Path(os.getenv("DANANGVIBES_STORAGE_PATH", "./storage/events"))
+    log_level = os.getenv("DANANGVIBES_LOG_LEVEL", "INFO").upper()
+    logging.basicConfig(level=getattr(logging, log_level, logging.INFO), format="%(name)s %(levelname)s %(message)s")
+    logging.getLogger("web_server").setLevel(getattr(logging, log_level, logging.INFO))
+    logging.getLogger("processing_cli").setLevel(getattr(logging, log_level, logging.INFO))
     return Settings(
         host=os.getenv("DANANGVIBES_HOST", "127.0.0.1"),
         port=int(os.getenv("DANANGVIBES_PORT", "8000")),

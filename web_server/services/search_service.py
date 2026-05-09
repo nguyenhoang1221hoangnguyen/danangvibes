@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import tempfile
 import json
 from pathlib import Path
@@ -7,6 +8,8 @@ from pathlib import Path
 from processing_cli.services.face import FaceDetection
 from web_server.config import settings
 from web_server.services.event_loader import EventBundle
+
+logger = logging.getLogger(__name__)
 
 
 class SearchService:
@@ -82,6 +85,7 @@ class SearchService:
         if isinstance(model_pair, str):
             return {"bib_matches": [], "face_matches": [], "suggested": [], "total_results": 0, "message": model_pair}
         stored_model_name, stored_model_version = model_pair
+        logger.debug("Face search: model=%s version=%s index_ntotal=%d", stored_model_name, stored_model_version, index.ntotal)
         try:
             import numpy as np
             from processing_cli.services.face_insightface import InsightFaceService
@@ -95,12 +99,16 @@ class SearchService:
             faces = InsightFaceService(model_name=stored_model_name, model_version=stored_model_version).detect_and_embed(temp_path)
         finally:
             temp_path.unlink(missing_ok=True)
+        logger.debug("Face search: detected %d face(s) in selfie", len(faces))
+        for i, f in enumerate(faces):
+            logger.debug("  face[%d]: confidence=%.3f bbox=%s", i, f["confidence"], f["bbox"])
         face = self._best_face(faces)
         if not face:
             return {"bib_matches": [], "face_matches": [], "suggested": [], "total_results": 0, "message": "Không tìm thấy khuôn mặt rõ trong selfie."}
 
         query = np.array([face["embedding"]], dtype="float32")
         index_dimension = getattr(index, "d", None)
+        logger.debug("Face search: query_dim=%d index_dim=%s", query.shape[1], index_dimension)
         if index_dimension is not None and int(index_dimension) != int(query.shape[1]):
             return {"bib_matches": [], "face_matches": [], "suggested": [], "total_results": 0, "message": "Face index không khớp dimension với model hiện tại. Hãy rebuild embeddings."}
         try:
@@ -109,6 +117,7 @@ class SearchService:
             raise RuntimeError("Install faiss-cpu to enable face search") from exc
         faiss.normalize_L2(query)
         distances, indices = index.search(query, settings.face_top_k)
+        logger.debug("Face search: top_k=%d threshold=%.2f raw_distances=%s", settings.face_top_k, settings.face_similarity_threshold, [round(float(d), 4) for d in distances[0] if float(d) >= 0])
 
         connection = self.bundle.get_connection()
         try:
@@ -117,13 +126,11 @@ class SearchService:
             for vector_id, distance in zip(indices[0], distances[0]):
                 if int(vector_id) < 0:
                     continue
-                # FAISS returns L2 distance after normalize_L2
-                # Convert to similarity: similarity = 1 - (distance^2 / 2)
-                # For normalized vectors: distance^2 = 2(1 - cosine_similarity)
-                # So: cosine_similarity = 1 - (distance^2 / 2)
-                similarity = 1.0 - (float(distance) ** 2 / 2.0)
+                # FaissBuilder uses IndexFlatIP. After L2-normalization,
+                # IndexFlatIP returns cosine similarity directly.
+                similarity = float(distance)
 
-                # Filter by similarity threshold (higher is better)
+                logger.debug("  vector_id=%d similarity=%.4f (threshold=%.2f %s)", int(vector_id), similarity, settings.face_similarity_threshold, "PASS" if similarity >= settings.face_similarity_threshold else "SKIP")
                 if similarity < settings.face_similarity_threshold:
                     continue
 
@@ -153,4 +160,5 @@ class SearchService:
                 )
         finally:
             connection.close()
+        logger.debug("Face search: %d matches returned", len(matches))
         return {"bib_matches": [], "face_matches": matches, "suggested": [], "total_results": len(matches)}

@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import TypedDict
 import tempfile
 import shutil
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 class FaceDetection(TypedDict):
@@ -49,7 +52,6 @@ class InsightFaceService:
         import json
         import cv2
 
-        # Handle non-ASCII paths
         img_path_str = str(image_path)
         temp_file = None
 
@@ -63,26 +65,26 @@ class InsightFaceService:
             use_path = temp_file.name
 
         try:
-            # Read image
             img = cv2.imread(use_path)
             if img is None:
+                logger.warning("InsightFace: failed to read image: %s", use_path)
                 return []
 
-            # Detect faces
+            logger.debug("InsightFace detect: image=%s shape=%s", use_path, img.shape)
             faces_data = self.app.get(img)
+            logger.debug("InsightFace detect: found %d face(s)", len(faces_data))
 
             faces: list[FaceDetection] = []
-            for face in faces_data:
-                # Get bounding box [x, y, w, h]
+            for i, face in enumerate(faces_data):
                 bbox = face.bbox.astype(int).tolist()
                 x1, y1, x2, y2 = bbox
                 bbox_xywh = [x1, y1, x2 - x1, y2 - y1]
 
-                # Get embedding (512-dim for buffalo_l)
                 embedding = face.normed_embedding.flatten().tolist()
+                emb_norm = float(np.linalg.norm(embedding))
 
-                # Get confidence (detection score)
                 confidence = float(face.det_score) if hasattr(face, 'det_score') else 0.99
+                logger.debug("  face[%d]: bbox=%s confidence=%.3f embedding_dim=%d norm=%.4f", i, bbox_xywh, confidence, len(embedding), emb_norm)
 
                 faces.append({
                     "bbox": json.dumps(bbox_xywh),
@@ -129,16 +131,13 @@ class FaceService:
         import tempfile
         import shutil
 
-        # DeepFace has bug with non-ASCII paths - copy to temp file if needed
         img_path_str = str(image_path)
         temp_file = None
 
         try:
-            # Check if path contains non-ASCII characters
             img_path_str.encode('ascii')
             use_path = img_path_str
         except UnicodeEncodeError:
-            # Path has non-ASCII chars - copy to temp file
             temp_file = tempfile.NamedTemporaryFile(suffix=image_path.suffix, delete=False)
             temp_file.close()
             shutil.copy2(image_path, temp_file.name)
@@ -151,7 +150,6 @@ class FaceService:
                 enforce_detection=False,
             )
         finally:
-            # Clean up temp file
             if temp_file:
                 try:
                     Path(temp_file.name).unlink()
