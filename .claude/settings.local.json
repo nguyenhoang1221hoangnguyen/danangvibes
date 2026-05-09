@@ -53,7 +53,9 @@
       "Bash(grep -E \"\\\\.css$|\\\\.scss$|\\\\.html$\")",
       "Bash(/Users/nguyenhoang/Desktop/2026/ungDung/danangvibes/venv/bin/python *)",
       "Bash(lsof -ti:8000)",
-      "Bash(open debug_output/annotated_027849f42fc88daf8f0f8089ddc324bf.jpg)"
+      "Bash(open debug_output/annotated_027849f42fc88daf8f0f8089ddc324bf.jpg)",
+      "Bash(/Users/huytrinh/Desktop/projects/opensources/danangvibes/venv-ai/bin/python --version)",
+      "Bash(/Users/huytrinh/Desktop/projects/opensources/danangvibes/venv-ai/bin/python *)"
     ]
   }
 }

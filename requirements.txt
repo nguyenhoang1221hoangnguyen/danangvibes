@@ -10,6 +10,9 @@ pytest>=8.0
 mypy>=1.8
 ruff>=0.4
 
+pytesseract>=0.3.10
+ultralytics>=8.1
+
 # Optional AI/vector dependencies for full OCR + face search workflows:
 # paddleocr>=2.7
 # deepface>=0.0.90

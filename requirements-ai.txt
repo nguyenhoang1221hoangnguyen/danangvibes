@@ -1,9 +1,21 @@
-# Optional AI dependencies for OCR + DeepFace face search workflows.
+# AI dependencies for OCR + face search workflows.
+pytesseract>=0.3.10
+ultralytics>=8.1
+
+# Face recognition (InsightFace — preferred for race photos)
+insightface>=0.7.3
+onnxruntime>=1.17
+
+# OCR (PaddleOCR — optional, heavier than Tesseract)
 paddleocr>=2.7,<3
 paddlepaddle>=2.6,<3
+
+# Face recognition (DeepFace — alternative)
 deepface>=0.0.90
 tensorflow>=2.16,<2.21
 tf-keras>=2.16,<2.21
+
+# Vector search
 faiss-cpu>=1.8
 numpy>=1.26
 opencv-python>=4.9
