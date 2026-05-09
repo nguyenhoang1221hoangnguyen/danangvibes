@@ -55,7 +55,8 @@
       "Bash(lsof -ti:8000)",
       "Bash(open debug_output/annotated_027849f42fc88daf8f0f8089ddc324bf.jpg)",
       "Bash(/Users/huytrinh/Desktop/projects/opensources/danangvibes/venv-ai/bin/python --version)",
-      "Bash(/Users/huytrinh/Desktop/projects/opensources/danangvibes/venv-ai/bin/python *)"
+      "Bash(/Users/huytrinh/Desktop/projects/opensources/danangvibes/venv-ai/bin/python *)",
+      "Bash(/Users/huytrinh/Desktop/projects/opensources/danangvibes/venv/bin/python *)"
     ]
   }
 }
